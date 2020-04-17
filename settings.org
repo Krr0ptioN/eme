@@ -1,0 +1,488 @@
+* Custom Function
+** Fast forward
+  #+BEGIN_SRC emacs-lisp
+  (defun forward-symbol-shift-aware (arg)
+  (interactive "^p")
+  (forward-symbol arg))
+  #+END_SRC
+
+** Swap line
+   #+BEGIN_SRC emacs-lisp
+(defun move-text-internal (arg)
+   (cond
+    ((and mark-active transient-mark-mode)
+     (if (> (point) (mark))
+            (exchange-point-and-mark))
+     (let ((column (current-column))
+              (text (delete-and-extract-region (point) (mark))))
+       (forward-line arg)
+       (move-to-column column t)
+       (set-mark (point))
+       (insert text)
+       (exchange-point-and-mark)
+       (setq deactivate-mark nil)))
+    (t
+     (beginning-of-line)
+     (when (or (> arg 0) (not (bobp)))
+       (forward-line)
+       (when (or (< arg 0) (not (eobp)))
+            (transpose-lines arg))
+       (forward-line -1)))))
+
+(defun move-text-down (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines down."
+   (interactive "*p")
+   (move-text-internal arg))
+
+(defun move-text-up (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines up."
+   (interactive "*p")3
+   (move-text-internal (- arg)))
+
+(windmove-default-keybindings 'meta)
+ ;; Shift the selected region right if distance is postive, left if
+ ;; negative
+
+ (defun shift-region (distance)
+  (let ((mark (mark)))
+    (save-excursion
+      (indent-rigidly (region-beginning) (region-end) distance)
+       (push-mark mark t t)
+       ;; Tell the command loop not to deactivate the mark
+       ;; for transient mark mode
+       (setq deactivate-mark nil))))
+   (defun shift-right ()
+     (interactive)
+	 (shift-region 1))
+   (defun shift-left ()
+     (interactive)
+	 (shift-region -1))
+   #+END_SRC 
+
+** Reload
+   #+BEGIN_SRC emacs-lisp
+   (defun reload ()
+       "Revert buffer, then restore previous position."
+       (interactive)
+       (let ((pt  (point)))
+       (revert-buffer t t)
+       (goto-char pt)))
+   #+END_SRC 
+
+** file
+   #+BEGIN_SRC emacs-lisp
+(defun add-to-alist (symbol name value)
+  "Add new pair to ALIST"
+  (let* ((list (symbol-value symbol))
+         (pair (assoc name list)))
+    (if pair
+        (setcdr pair value)
+      (let ((pair (cons name value)))
+        (if list
+            (setf (symbol-value symbol) (cons pair list))
+          (setf (symbol-value symbol) (cons pair nil)))))
+    (symbol-value symbol)))
+
+(defun remove-alist (symbol name)
+  "Remove pair from ALIST"
+  (let* ((list (symbol-value symbol))
+         (pair (assoc name list)))
+    (if pair
+        (let ((ptr list))
+          (if (eq (caar ptr) name)
+              (setf (symbol-value symbol) '())
+            (while ptr
+              (if (eq (caadr ptr) name)
+                  (progn
+                    (setcdr ptr (cddr ptr))
+                    (setq ptr nil))
+                (setq ptr (cdr ptr))))
+            list)))))
+
+(require 'filenotify)
+
+  (defun kill-all-dired-buffers ()
+      "Kill all dired buffers."
+      (interactive)
+      (save-excursion
+        (let ((count 0))
+          (dolist (buffer (buffer-list))
+            (set-buffer buffer)
+            (when (equal major-mode 'dired-mode)
+              (setq count (1+ count))
+              (kill-buffer buffer)))
+          (message "Killed %i dired buffer(s)." count))))
+
+(setq file-watchers '())
+
+
+(defun watch ()
+  "Function watch file changes and reload the file from buffer"
+  (interactive)
+  (let* ((fname (buffer-file-name))
+         (pair (assoc fname file-watchers)))
+    (if pair
+        (progn
+          (file-notify-rm-watch (cdr pair))
+          (remove-alist 'file-watchers descritor)))
+
+    (let ((descriptor (file-notify-add-watch fname
+                                             '(change)
+                                             (lexical-let ((filename fname))
+                                               (lambda (event)
+                                                 (with-current-buffer (get-file-buffer filename)
+                                                   (if (not (buffer-modified-p))
+                                                       (progn
+                                                         (message "update %s" filename)
+                                                         (reload)))))))))
+      (add-to-alist 'file-watchers fname descriptor))))
+   #+END_SRC
+
+* Settings
+** Melpa repo
+   #+BEGIN_SRC emacs-lisp
+   (require 'package)
+   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+   (package-initialize)
+   #+END_SRC
+
+** Appearance
+*** Disable the menu bar
+    #+BEGIN_SRC emacs-lisp
+    (menu-bar-mode 0)
+    #+END_SRC
+
+*** Disable the tool bar
+    #+BEGIN_SRC emacs-lisp
+    (tool-bar-mode 0)
+    #+END_SRC
+
+*** Disable the scroll bar
+    #+BEGIN_SRC emacs-lisp
+    (scroll-bar-mode -1)
+    #+END_SRC
+
+*** Disable the start splesh screen
+   #+BEGIN_SRC emacs-lisp
+   (setq inhibit-startup-screen t)
+   #+END_SRC
+
+*** Font
+	#+BEGIN_SRC emacs-lisp
+	(set-default-font "Fira Code-9")
+	#+END_SRC
+
+*** Visual select background color
+   #+BEGIN_SRC emacs-lisp
+   (set-face-attribute 'region nil :background "#666")
+   #+END_SRC
+
+*** ido vertical mode
+   #+BEGIN_SRC emacs-lisp
+   (ido-mode)
+   (require 'ido-vertical-mode)
+   (ido-mode 1)
+   (ido-vertical-mode 1)
+   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+   #+END_SRC
+
+*** Auto close the mark
+  #+BEGIN_SRC emacs-lisp
+	(electric-pair-mode 1)
+  #+END_SRC
+
+*** Do not ask for theme threat
+*** Safe mode for themes
+    #+BEGIN_SRC emacs-lisp
+    (setq custom-safe-themes t)
+	#+END_SRC
+
+*** Show line number
+	#+BEGIN_SRC emacs-lisp
+	(global-linum-mode t)
+	(setq linum-format "%3d \u2503")
+	(setq line-number-mode t)
+	(setq column-number-mode t)
+	(setq doc-view-continuous t)
+	#+END_SRC
+
+*** Icon
+	#+BEGIN_SRC emacs-lisp
+	(use-package all-the-icons
+	:ensure t)
+	#+END_SRC
+
+*** Cursor
+**** Charater
+	 * Change cursor block to |-Bleam
+	 #+BEGIN_SRC emacs-lisp
+	 (setq-default cursor-type 'bar)
+	 #+END_SRC
+
+*** Themes 
+**** Load theme
+	#+BEGIN_SRC emacs-lisp
+	(use-package doom-themes
+	:ensure t
+	:config
+	;; load Molokai theme
+	(load-theme 'doom-molokai)
+	;; Org mode 
+	(doom-themes-org-config))
+	#+END_SRC
+
+**** Neotree theme
+	#+BEGIN_SRC emacs-lisp
+	(doom-themes-neotree-config)
+	#+END_SRC
+
+**** Mode line
+	#+BEGIN_SRC emacs-lisp
+	(doom-modeline-mode 2)
+	(setq doom-modeline-height 3)
+	#+END_SRC	
+
+** Org Mode
+*** Keyword used in todo file and org-mode
+   #+BEGIN_SRC emacs-lisp
+   (setq org-todo-keywords
+       '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+   #+END_SRC
+
+*** Bullets
+   #+BEGIN_SRC emacs-lisp
+   (use-package org-bullets
+      :ensure t
+	  :config
+	  (add-hook 'org-mode-hook (lambda ()
+	  (org-bullets-mode 1))))
+   #+END_SRC
+
+*** Keybinding
+**** fill the check bos in org-mode
+    #+BEGIN_SRC emacs-lisp
+ (global-set-key [f5] 'org-toggle-checkbox)
+    #+END_SRC
+
+** Multiple Cusor
+  #+BEGIN_SRC emacs-lisp
+  (require 'multiple-cursors)
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-=") 'er/expand-region)
+  #+END_SRC
+
+** Google translate
+   * English and Fucking persian
+   #+BEGIN_SRC emacs-lisp
+   (setq google-translate-translation-directions-alist
+   '(("en" . "fa") ("fa" . "en") ))
+   (global-set-key [f8] 'google-translate-smooth-translate)
+   #+END_SRC
+
+** Assembly mode
+   #+BEGIN_SRC emacs-lisp
+   (add-to-list 'auto-mode-alist '("\\.asm\\'" . nasm-mode))
+   (defun my-asm-mode-hook ()
+     ;; Indent
+     (setq tab-always-indent 8))
+     (add-hook 'nasm-mode-hook #'my-asm-mode-hook)
+   #+END_SRC
+
+** Clang mode
+*** Add the cc-mode
+#+BEGIN_SRC emacs-lisp
+   (require 'cc-mode)
+#+END_SRC
+
+*** Tab size
+#+BEGIN_SRC emacs-lisp
+(setq-default c-basic-offset 4 c-default-style "linux")
+(setq-default tab-width 4 indent-tabs-mode t)
+(define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+#+END_SRC
+
+*** Auto complete
+  #+BEGIN_SRC emacs-lisp
+  (require 'auto-complete-clang)
+  (define-key c++-mode-map (kbd "C-S-<return>") 'ac-complete-clang)
+  (require 'auto-complete-config)
+  (ac-config-default)
+  #+END_SRC 
+**** Ensure the go specific autocomplete is active in go-mode
+     #+BEGIN_SRC emacs-lisp
+     (with-eval-after-load 'go-mode
+     (require 'go-autocomplete))
+     #+END_SRC
+
+*** Yasnippet
+  #+BEGIN_SRC emacs-lisp
+  (require 'yasnippet)
+  (yas-global-mode 1)
+  (global-flycheck-mode)
+  #+END_SRC
+
+*** Keybinding
+	  #+BEGIN_SRC emacs-lisp
+      (key-chord-define c-mode-map ";;"  "\C-e;")
+	  #+END_SRC 
+      #+BEGIN_SRC emacs-lisp
+      (key-chord-define c-mode-map "{}"  "{\n\n}\C-p\t")
+      #+END_SRC
+      
+** Golang mode
+*** PATH
+    #+BEGIN_SRC emacs-lisp
+    (when (memq window-system '(mac ns x))
+          (exec-path-from-shell-initialize)
+          (exec-path-from-shell-copy-env "GOPATH"))
+    #+END_SRC
+
+*** guru settings
+    #+BEGIN_SRC emacs-lisp
+   (go-guru-hl-identifier-mode)
+   (require 'go-guru)
+    #+END_SRC
+
+*** Keybinding
+**** Go to definition
+#+BEGIN_SRC emacs-lisp
+  (local-set-key (kbd "M-.") 'godef-jump)
+#+END_SRC
+
+**** Return from whence you came
+   #+BEGIN_SRC emacs-lisp
+   (local-set-key (kbd "M-*") 'pop-tag-mark)
+   #+END_SRC
+
+**** Invoke compiler
+      #+BEGIN_SRC emacs-lisp
+	 (local-set-key (kbd "M-p") 'compile) 
+      #+END_SRC
+
+**** Redo most recent compile cmd
+   #+BEGIN_SRC emacs-lisp
+       (local-set-key (kbd "M-P") 'recompile)
+   #+END_SRC
+
+**** Error
+***** Go to next error (or msg)
+       #+BEGIN_SRC emacs-lisp
+    (local-set-key (kbd "M-]") 'next-error) 
+       #+END_SRC
+
+***** Go to previous error or msg
+       #+BEGIN_SRC emacs-lisp
+	 (local-set-key (kbd "M-[") 'previous-error)
+       #+END_SRC
+
+*** Go documentation
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'go-mode-hook '(lambda ()
+    (local-set-key (kbd "C-c C-k") 'godoc)))
+    (add-hook 'go-mode-hook 'company-mode)
+    (add-hook 'go-mode-hook (lambda ()
+    (set (make-local-variable 'company-backends) '(company-go))
+    (company-mode)))
+    #+END_SRC 
+ 
+*** HOOK
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'go-mode-hook 'extin-go-mode-hook)
+    #+END_SRC
+
+** LaTeX mode
+** Python mode
+*** Elpy
+    #+BEGIN_SRC emacs-lisp
+    (elpy-enable)
+    #+END_SRC
+
+** Magit
+*** Keybinding
+**** Open status
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "C-x g") 'magit-status)
+   #+END_SRC
+
+** Keybindin
+
+    | Key       | Descreption              |
+    | --------- | ------------------------ |
+    | C-S-up    | swap line to up          |
+    | C-S-down  | swap line to down        |
+    | F8        | Neotree toggle           |
+    | C-S-left  | Indent and shift to left |
+    | C-S-right | Indent and shift to righ |
+
+*** Shift the line to up or down
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key [\C-\S-up] 'move-text-up)
+   (global-set-key [\C-\S-down] 'move-text-down)
+   #+END_SRC 
+
+*** Shift the line to left or right
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key [C-S-right] 'shift-right)
+   (global-set-key [C-S-left] 'shift-left)
+   #+END_SRC
+
+*** Shrink window
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "<M-S-up>") 'shrink-window)
+   (global-set-key (kbd "<M-S-down>") 'enlarge-window)
+   #+END_SRC
+
+*** Srink horizontally window
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "<M-S-left>") 'shrink-window-horizontally)
+   (global-set-key (kbd "<M-S-right>") 'enlarge-window-horizontally)
+   #+END_SRC
+
+*** Neotree toggle
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key [f6] 'neotree-toggle)
+   #+END_SRC
+
+*** Toggle for line number
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "M-n") 'linum-mode)
+   #+END_SRC
+
+*** Man page
+   #+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-m") 'man)
+   #+END_SRC
+
+*** Move betwen word
+    #+BEGIN_SRC emacs-lisp
+    (local-set-key (kbd "C-<right>") 'forward-symbol-shift-aware)
+    (local-set-key (kbd "C-<left>") (lambda () (interactive "^")
+                               (forward-symbol-shift-aware -1)))
+    #+END_SRC 
+
+* Some comment
+  #+BEGIN_SRC emacs-lisp
+
+; Backup from main config file
+;(setq backup-directory-alist '(("." . "~/.emacs_saves")))
+
+;(require 'go-autocomplete)
+;(require 'auto-complete-config)
+;(ac-config-default)
+;; Snag the user's PATH and GOPATH
+
+;; Define function to call when go-mode loads
+;; (defun extin-go-mode-hook ()
+;;   (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
+;;   (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
+;;   (if (not (string-match "go" compile-command))   ; set compile command default
+;;       (set (make-local-variable 'compile-command)
+;;            "go build -v && go test -v && go vet"))
+
+  #+END_SRC
+
