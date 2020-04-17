@@ -105,6 +105,7 @@
 
   (defun kill-all-dired-buffers ()
       "Kill all dired buffers."
+
       (interactive)
       (save-excursion
         (let ((count 0))
@@ -139,7 +140,6 @@
                                                          (reload)))))))))
       (add-to-alist 'file-watchers fname descriptor))))
    #+END_SRC
-
 * Settings
 ** Melpa repo
    #+BEGIN_SRC emacs-lisp
