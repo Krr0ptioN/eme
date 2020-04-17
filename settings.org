@@ -140,6 +140,7 @@
                                                          (reload)))))))))
       (add-to-alist 'file-watchers fname descriptor))))
    #+END_SRC
+
 * Settings
 ** Melpa repo
    #+BEGIN_SRC emacs-lisp
