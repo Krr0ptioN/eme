@@ -170,9 +170,21 @@
    #+END_SRC
 
 *** Font
+**** Encoding
+	 #+BEGIN_SRC emacs-lisp
+	 (set-language-environment "UTF-8")
+	 (set-default-coding-systems 'utf-8)
+	 #+END_SRC
+
+**** Display font
 	#+BEGIN_SRC emacs-lisp
 	(set-default-font "Fira Code-9")
 	#+END_SRC
+
+**** Prettify font
+	 #+BEGIN_SRC
+	 (global-prettify-symbols-mode 1)
+	 #+END_SRC
 
 *** Visual select background color
    #+BEGIN_SRC emacs-lisp
@@ -182,10 +194,13 @@
 *** ido vertical mode
    #+BEGIN_SRC emacs-lisp
    (ido-mode)
-   (require 'ido-vertical-mode)
-   (ido-mode 1)
-   (ido-vertical-mode 1)
-   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+   (use-package ido-vertical-mode
+   :ensure t
+   :config
+      (ido-mode 1)
+      (ido-vertical-mode 1)
+      (setq ido-vertical-define-keys 'C-n-and-C-p-only))
+
    #+END_SRC
 
 *** Auto close the mark
@@ -201,11 +216,16 @@
 
 *** Show line number
 	#+BEGIN_SRC emacs-lisp
-	(global-linum-mode t)
-	(setq linum-format "%3d \u2503")
-	(setq line-number-mode t)
-	(setq column-number-mode t)
+	;(global-linum-mode t)
+	(setq linum-format "%4d ")
+	;(setq line-number-mode t)
+	;(setq column-number-mode t)
 	(setq doc-view-continuous t)
+	(use-package linum-relative :ensure t)
+	(setq linum-relative-global-mode t)
+	(setq linum-relative-backend 'display-line-numbers-mode)
+	;(setq linum-relative-current-symbol "->")
+	()
 	#+END_SRC
 
 *** Icon
@@ -221,16 +241,27 @@
 	 (setq-default cursor-type 'bar)
 	 #+END_SRC
 
+**** Highlight current line
+	 #+BEGIN_SRC emacs-lisp
+	 (global-hl-line-mode 1)
+	 #+END_SRC
+
 *** Themes 
 **** Load theme
 	#+BEGIN_SRC emacs-lisp
 	(use-package doom-themes
 	:ensure t
-	:config
+	;:config
 	;; load Molokai theme
-	(load-theme 'doom-molokai)
+	;(load-theme 'doom-molokai)
 	;; Org mode 
-	(doom-themes-org-config))
+	;(doom-themes-org-config))
+	)
+	(use-package base16-theme
+	:ensure t
+	:config
+	(load-theme 'base16-classic-dark))
+
 	#+END_SRC
 
 **** Neotree theme
@@ -240,10 +271,11 @@
 
 **** Mode line
 	#+BEGIN_SRC emacs-lisp
+	(use-package doom-modeline
+	:ensure t)
 	(doom-modeline-mode 2)
 	(setq doom-modeline-height 3)
 	#+END_SRC	
-
 ** Org Mode
 *** Keyword used in todo file and org-mode
    #+BEGIN_SRC emacs-lisp
@@ -260,28 +292,39 @@
 	  (org-bullets-mode 1))))
    #+END_SRC
 
+*** Babel
+**** Shell
+    #+BEGIN_SRC emacs-lisp
+    (org-babel-do-load-languages 'org-babel-load-languages
+   '((shell . t)))
+    #+END_SRC
 *** Keybinding
 **** fill the check bos in org-mode
     #+BEGIN_SRC emacs-lisp
- (global-set-key [f5] 'org-toggle-checkbox)
+    (global-set-key [f5] 'org-toggle-checkbox)
     #+END_SRC
 
-** Multiple Cusor
-  #+BEGIN_SRC emacs-lisp
-  (require 'multiple-cursors)
-  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-  (global-set-key (kbd "C-=") 'er/expand-region)
-  #+END_SRC
-
-** Google translate
-   * English and Fucking persian
+** Tabnine
    #+BEGIN_SRC emacs-lisp
+   (use-package company-tabnine :ensure t)
+   (add-to-list 'company-backends #'company-tabnine)
+   ;; Trigger completion immediately.
+   (setq company-idle-delay 0)
+   ;; Number the candidates (use M-1, M-2 etc to select completions).
+   (setq company-show-numbers t)
+   (add-hook 'after-init-hook 'global-company-mode)
+
+   #+END_SRC
+   
+** Google translate
+   * English & Kurdish(kurmanji)
+   #+BEGIN_SRC emacs-lisp
+   (use-package google-translate
+   :ensure t
+   :config
    (setq google-translate-translation-directions-alist
-   '(("en" . "fa") ("fa" . "en") ))
-   (global-set-key [f8] 'google-translate-smooth-translate)
+   '(("en" . "ku") ("ku" . "en") ))
+   (global-set-key [f8] 'google-translate-smooth-translate))
    #+END_SRC
 
 ** Assembly mode
@@ -301,28 +344,27 @@
 
 *** Tab size
 #+BEGIN_SRC emacs-lisp
-(setq-default c-basic-offset 4 c-default-style "linux")
-(setq-default tab-width 4 indent-tabs-mode t)
+(setq-default c-basic-offset 8 c-default-style "linux")
+(setq-default tab-width 8 indent-tabs-mode t)
 (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
 #+END_SRC
 
 *** Auto complete
   #+BEGIN_SRC emacs-lisp
-  (require 'auto-complete-clang)
+  (use-package auto-complete-clang
+  :ensure t
+  :config
   (define-key c++-mode-map (kbd "C-S-<return>") 'ac-complete-clang)
-  (require 'auto-complete-config)
+  (require 'auto-complete-config))
   (ac-config-default)
   #+END_SRC 
-**** Ensure the go specific autocomplete is active in go-mode
-     #+BEGIN_SRC emacs-lisp
-     (with-eval-after-load 'go-mode
-     (require 'go-autocomplete))
-     #+END_SRC
 
 *** Yasnippet
   #+BEGIN_SRC emacs-lisp
-  (require 'yasnippet)
-  (yas-global-mode 1)
+  (use-package yasnippet-snippets
+  :ensure t
+  :config
+  (yas-global-mode 1))
   (global-flycheck-mode)
   #+END_SRC
 
@@ -335,8 +377,17 @@
       #+END_SRC
       
 ** Golang mode
+*** Ensure the go specific autocomplete is active in go-mode
+     #+BEGIN_SRC emacs-lisp
+     (use-package go-autocomplete
+     :ensure t)
+     (with-eval-after-load 'go-mode
+     (require 'go-autocomplete))
+     #+END_SRC
 *** PATH
     #+BEGIN_SRC emacs-lisp
+    (use-package exec-path-from-shell
+    :ensure t)
     (when (memq window-system '(mac ns x))
           (exec-path-from-shell-initialize)
           (exec-path-from-shell-copy-env "GOPATH"))
@@ -344,15 +395,17 @@
 
 *** guru settings
     #+BEGIN_SRC emacs-lisp
+   (use-package go-guru
+   :ensure t
+   )
    (go-guru-hl-identifier-mode)
-   (require 'go-guru)
     #+END_SRC
 
 *** Keybinding
 **** Go to definition
-#+BEGIN_SRC emacs-lisp
-  (local-set-key (kbd "M-.") 'godef-jump)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+   (local-set-key (kbd "M-.") 'godef-jump)
+   #+END_SRC
 
 **** Return from whence you came
    #+BEGIN_SRC emacs-lisp
@@ -399,6 +452,8 @@
 ** Python mode
 *** Elpy
     #+BEGIN_SRC emacs-lisp
+    (use-package elpy
+    :ensure t)
     (elpy-enable)
     #+END_SRC
 
@@ -406,18 +461,27 @@
 *** Keybinding
 **** Open status
    #+BEGIN_SRC emacs-lisp
-   (global-set-key (kbd "C-x g") 'magit-status)
+   (use-package magit
+   :ensure t
+   :config
+   (global-set-key (kbd "C-x g") 'magit-status))
    #+END_SRC
+** Terminal Emulators
+   #+BEGIN_SRC emacs-lisp
+   (use-package vterm :ensure t)
+   (add-hook 'vterm-mode (lambda () (linum-mode -1)))
+   #+END_SRC
+** Keybinding
 
-** Keybindin
-
-    | Key       | Descreption              |
-    | --------- | ------------------------ |
+    | Key       | Description              |
+    |-----------+--------------------------|
     | C-S-up    | swap line to up          |
     | C-S-down  | swap line to down        |
-    | F8        | Neotree toggle           |
+    | F8        | Google Translate         |
     | C-S-left  | Indent and shift to left |
     | C-S-right | Indent and shift to righ |
+    | F6        | Neotree Toggle           |
+    | F7        | Terminal                 |
 
 *** Shift the line to up or down
    #+BEGIN_SRC emacs-lisp
@@ -450,12 +514,12 @@
 
 *** Toggle for line number
    #+BEGIN_SRC emacs-lisp
-   (global-set-key (kbd "M-n") 'linum-mode)
+   (global-set-key (kbd "M-n") 'linum-relative-toggle)
    #+END_SRC
 
 *** Man page
    #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-m") 'man)
+   (global-set-key (kbd "C-x C-m") 'man)
    #+END_SRC
 
 *** Move betwen word
@@ -464,7 +528,25 @@
     (local-set-key (kbd "C-<left>") (lambda () (interactive "^")
                                (forward-symbol-shift-aware -1)))
     #+END_SRC 
-
+*** Multiple Cusor
+   #+BEGIN_SRC emacs-lisp
+   (use-package multiple-cursors
+   :ensure t
+   :config
+   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+   #+END_SRC
+*** Expand Region
+    #+BEGIN_SRC emacs-lisp
+    (use-package expand-region :ensure t)
+      (global-set-key (kbd "C-=") 'er/expand-region)
+    #+END_SRC 
+*** Terminal
+    #+BEGIN_SRC emacs-lisp
+    (global-set-key [f7] 'vterm)
+    #+END_SRC
 * Some comment
   #+BEGIN_SRC emacs-lisp
 
@@ -485,4 +567,4 @@
 ;;            "go build -v && go test -v && go vet"))
 
   #+END_SRC
-
+  
