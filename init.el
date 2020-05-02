@@ -73,7 +73,7 @@ static char *gnus-pointer[] = {
  '(org-agenda-files (quote ("~/dotfile/.todo.org")))
  '(package-selected-packages
    (quote
-    (ob-ipython ein ipython-shell-send linum-relative centered-cursor-mode vterm flyspell-correct base16-theme alect-themes babel org-babel-eval-in-repl org-superstar org-bullets expand-region magit ranger multi-term theme-magic key-chord multiple-cursors company-go nasm-mode neotree flycheck-cstyle ycm zeal-at-point go-playground exec-path-from-shell go-autocomplete spotify elpy pydoc python-mode google-translate ## auto-dictionary doom-modeline doom-themes fira-code-mode w3m ido-sort-mtime pdf-tools yasnippet molokai-theme chess auto-complete-clang auto-complete-c-headers)))
+    (dashboard ob-ipython ein ipython-shell-send linum-relative centered-cursor-mode vterm flyspell-correct base16-theme alect-themes babel org-babel-eval-in-repl org-superstar org-bullets expand-region magit ranger multi-term theme-magic key-chord multiple-cursors company-go nasm-mode neotree flycheck-cstyle ycm zeal-at-point go-playground exec-path-from-shell go-autocomplete spotify elpy pydoc python-mode google-translate ## auto-dictionary doom-modeline doom-themes fira-code-mode w3m ido-sort-mtime pdf-tools yasnippet molokai-theme chess auto-complete-clang auto-complete-c-headers)))
  '(pdf-view-midnight-colors (cons "#c6c6c6" "#282b33"))
  '(rustic-ansi-faces
    ["#282b33" "#e1c1ee" "#5b94ab" "#cfcf9c" "#819cd6" "#a6c1e0" "#7289bc" "#c6c6c6"])
