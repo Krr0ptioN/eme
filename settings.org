@@ -180,11 +180,20 @@
 **** Display font
 	#+BEGIN_SRC emacs-lisp
 	(set-default-font "Fira Code-9")
+	(use-package fira-code-mode
+	:ensure t 
+	:config (global-fira-code-mode))
 	#+END_SRC
 
 **** Prettify font
-	 #+BEGIN_SRC
+	 #+BEGIN_SRC emacs-lisp
 	 (global-prettify-symbols-mode 1)
+	 (setq prettify-symbols-alist
+	 '(("lambda" . 955) ; λ
+          ("->" . 8594)    ; →
+          ("=>" . 8658)    ; ⇒
+          ("map" . 8614)    ; ↦ 
+	  ))
 	 #+END_SRC
 
 *** Visual select background color
@@ -209,7 +218,6 @@
 	(electric-pair-mode 1)
   #+END_SRC
 
-*** Do not ask for theme threat
 *** Safe mode for themes
     #+BEGIN_SRC emacs-lisp
     (setq custom-safe-themes t)
@@ -217,16 +225,8 @@
 
 *** Show line number
 	#+BEGIN_SRC emacs-lisp
-	;(global-linum-mode t)
-	(setq linum-format "%4d ")
-	;(setq line-number-mode t)
-	;(setq column-number-mode t)
 	(setq doc-view-continuous t)
-	(use-package linum-relative :ensure t)
-	(setq linum-relative-global-mode t)
-	(setq linum-relative-backend 'display-line-numbers-mode)
-	;(setq linum-relative-current-symbol "->")
-	()
+	(global-display-line-numbers-mode)	
 	#+END_SRC
 
 *** Icon
@@ -267,6 +267,7 @@
 
 **** Neotree theme
 	#+BEGIN_SRC emacs-lisp
+	(use-package neotree :ensure t)
 	(doom-themes-neotree-config)
 	#+END_SRC
 
@@ -275,12 +276,28 @@
 	(use-package doom-modeline
 	:ensure t)
 	(doom-modeline-mode 2)
-	(setq doom-modeline-height 3)
+	(setq doom-modeline-height 1)
 	#+END_SRC	
+
+*** Dashboard
+  #+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+  :ensure t
+  :diminish dashboard-mode
+  :config
+  (setq dashboard-center-content t)
+  (setq dashboard-startup-banner 3)
+  (setq dashboard-banner-logo-title "Mardin")
+  (setq dashboard-items '((recents  . 10)
+  (bookmarks . 10)))
+  (setq dashboard-set-navigator t)
+  (dashboard-setup-startup-hook))
+
+  #+END_SRC
 ** Org Mode
 *** Keyword used in todo file and org-mode
    #+BEGIN_SRC emacs-lisp
-   (setq org-todo-keywords
+       (setq org-todo-keywords
        '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
    #+END_SRC
 
@@ -294,26 +311,25 @@
    #+END_SRC
 
 *** Babel
-**** Shell
     #+BEGIN_SRC emacs-lisp
     (org-babel-do-load-languages 'org-babel-load-languages
-   '((shell . t)))
+    '((shell . t)))
+
     #+END_SRC
 *** Keybinding
 **** fill the check bos in org-mode
     #+BEGIN_SRC emacs-lisp
     (global-set-key [f5] 'org-toggle-checkbox)
     #+END_SRC
-
 ** Tabnine
    #+BEGIN_SRC emacs-lisp
    (use-package company-tabnine :ensure t)
    (add-to-list 'company-backends #'company-tabnine)
-   ;; Trigger completion immediately.
-   (setq company-idle-delay 0)
-   ;; Number the candidates (use M-1, M-2 etc to select completions).
-   (setq company-show-numbers t)
-   (add-hook 'after-init-hook 'global-company-mode)
+     ;; ;; Trigger completion immediately.
+     (setq company-idle-delay 0)
+     ;; ;; Number the candidates (use M-1, M-2 etc to select completions).
+     (setq company-show-numbers t)
+     (add-hook 'after-init-hook 'global-company-mode)
 
    #+END_SRC
    
@@ -454,10 +470,21 @@
 *** Elpy
     #+BEGIN_SRC emacs-lisp
     (use-package elpy
-    :ensure t)
-    (elpy-enable)
-    #+END_SRC
+    :ensure t
+    :init
+    (elpy-enable))
 
+    #+END_SRC
+*** Python shell
+    #+BEGIN_SRC emacs-lisp
+    (setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "-i --simple-prompt")
+
+    #+END_SRC 
+*** Ipython
+    #+BEGIN_SRC emacs-lisp
+    (use-package ein :ensure t)
+    #+END_SRC
 ** Magit
 *** Keybinding
 **** Open status
@@ -490,7 +517,7 @@
    (global-set-key [\C-\S-down] 'move-text-down)
    #+END_SRC 
 
-*** Shift the line to left or right
+*** Indent the line to left or right
    #+BEGIN_SRC emacs-lisp
    (global-set-key [C-S-right] 'shift-right)
    (global-set-key [C-S-left] 'shift-left)
@@ -515,7 +542,7 @@
 
 *** Toggle for line number
    #+BEGIN_SRC emacs-lisp
-   (global-set-key (kbd "M-n") 'linum-relative-toggle)
+   (global-set-key (kbd "M-n") 'display-line-numbers-mode)
    #+END_SRC
 
 *** Man page
