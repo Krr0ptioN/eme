@@ -317,7 +317,17 @@
 	(setq doc-view-continuous t)
 	(global-display-line-numbers-mode)	
 	#+END_SRC
-
+*** Centaur Tab
+	#+BEGIN_SRC emacs-lisp
+		(use-package centaur-tabs
+			:ensure t
+  			:demand
+  			:config
+  			(centaur-tabs-mode t)
+  			:bind
+  			("C-<prior>" . centaur-tabs-backward)
+  			("C-<next>" . centaur-tabs-forward))
+	#+END_SRC
 *** Icon
 	#+BEGIN_SRC emacs-lisp
 	(use-package all-the-icons
