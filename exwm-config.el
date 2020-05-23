@@ -56,4 +56,4 @@
  (start-process-shell-command "" nil "nm-applet &")
  (start-process-shell-command "" nil "pasystray &")
   (start-process-shell-command "" nil "xfce4-power-manager &")
- (start-process-shell-command "" nil "setxkbmap -model pc105 -layout us,\"ir(ku)\",ir -option 'grp:ctrls_toggle'"))
+ (start-process-shell-command "" nil "setxkbmap -model pc105 -layout us,\"ir(ku)\" -option 'grp:ctrls_toggle'"))
