@@ -654,24 +654,3 @@
       		(interactive (list (read-shell-command "➜ ")))
       		(start-process-shell-command command nil command)))
     #+END_SRC
-* Some comment
-  #+BEGIN_SRC emacs-lisp
-
-; Backup from main config file
-;(setq backup-directory-alist '(("." . "~/.emacs_saves")))
-
-;(require 'go-autocomplete)
-;(require 'auto-complete-config)
-;(ac-config-default)
-;; Snag the user's PATH and GOPATH
-
-;; Define function to call when go-mode loads
-;; (defun extin-go-mode-hook ()
-;;   (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
-;;   (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
-;;   (if (not (string-match "go" compile-command))   ; set compile command default
-;;       (set (make-local-variable 'compile-command)
-;;            "go build -v && go test -v && go vet"))
-
-  #+END_SRC
-  
