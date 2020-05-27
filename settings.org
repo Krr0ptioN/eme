@@ -170,9 +170,11 @@
    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
    (package-initialize)
    #+END_SRC
+
 ** EXWM
    #+BEGIN_SRC emacs-lisps
    #+END_SRC
+
 ** Appearance
 *** Disable the menu bar
     #+BEGIN_SRC emacs-lisp
@@ -234,8 +236,8 @@
       (ido-mode 1)
       (ido-vertical-mode 1)
       (setq ido-vertical-define-keys 'C-n-and-C-p-only))
-
    #+END_SRC
+
 *** Auto close the mark
   #+BEGIN_SRC emacs-lisp
 	(electric-pair-mode 1)
@@ -251,17 +253,26 @@
 	(setq doc-view-continuous t)
 	(global-display-line-numbers-mode)	
 	#+END_SRC
+
 *** Centaur Tab
 	#+BEGIN_SRC emacs-lisp
-		(use-package centaur-tabs
-			:ensure t
-  			:demand
-  			:config
-  			(centaur-tabs-mode t)
-  			:bind
-  			("C-<prior>" . centaur-tabs-backward)
-  			("C-<next>" . centaur-tabs-forward))
+	;(use-package centaur-tabs
+	;	:ensure t
+  	;	:config
+  	;	(centaur-tabs-mode t)
+	;	(centaur-tabs-headline-match)
+	;	(setq centaur-tabs-style "wave")
+	;;	(setq centaur-tabs-set-icons t)
+	;	(setq centaur-tabs-plain-icons t)
+	;	(setq centaur-tabs-gray-out-icons 'buffer)
+	;	(setq centaur-tabs-set-bar 'over)
+	;	(setq centaur-tabs-close-button "X")
+	;	(setq centaur-tabs-modified-marker "*")
+  	;	:bind
+  	;	("C-<prior>" . centaur-tabs-backward)
+  	;	("C-<next>" . centaur-tabs-forward))
 	#+END_SRC
+
 *** Icon
 	#+BEGIN_SRC emacs-lisp
 	(use-package all-the-icons
@@ -283,20 +294,22 @@
 *** Themes 
 **** Load theme
 	#+BEGIN_SRC emacs-lisp
-	(use-package doom-themes
-	:ensure t
-	;:config
-	;; load Molokai theme
-	;(load-theme 'doom-molokai)
-	;; Org mode 
-	;(doom-themes-org-config))
-	)
-	(use-package base16-theme
-	:ensure t
-	:config
-	;(load-theme 'base16-classic-dark)
-	(load-theme 'base16-black-metal-venom))
-
+	  ;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+	  (use-package doom-themes
+	  :ensure t
+	  ;:config
+	  ;; load Molokai theme
+	  ;(load-theme 'doom-molokai)
+	  ;; Org mode 
+	  ;(doom-themes-org-config))
+	  )
+	  ;; (use-package base16-theme
+	  ;; ;:ensure t
+	  ;; ;:config
+	  ;; ;(load-theme 'base16-classic-dark)
+	  ;; ;(load-theme 'base16-black-metal-venom)
+	  ;; )
+	  (load-theme 'gruber-darker)
 	#+END_SRC
 
 **** Neotree theme
@@ -327,8 +340,8 @@
   (bookmarks . 10)))
   (setq dashboard-set-navigator t)
   (dashboard-setup-startup-hook))
-
   #+END_SRC
+ 
 ** Mode
 *** Org Mode
 **** Keyword used in todo file and org-mode
