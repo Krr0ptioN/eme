@@ -552,12 +552,10 @@
     | C-c r      | Reload config file                      |
     | C-=        | Expand region                           |
     | C-x C-m    | Man page                                |
-    | ---------- | -------------------------------         |
     | C-S-c      | multiple-cursor/edit-lines              |
     | C->        | multiple-cursor/mark-next-like-this     |
     | C-<        | multiple-cursor/mark-previous-like-this |
     | C-c C-<    | multiple-cursor/editmark-all-like-this  |
-    | ---------- | -------------------------------         |
     | M-Return   | Execute command in background           |
     | M-n        | Line numbers toggle                     |
     | F6         | Neotree Toggle                          |
