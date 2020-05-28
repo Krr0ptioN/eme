@@ -1,17 +1,19 @@
 
 DOTEMACS=~/.emacs.d
+copy = cp -r
+
+init:
+	$(copy) ./src/init.el $(DOTEMACS)
+
+settings-org: # main configuration
+	$(copy) ./src/settings.org $(DOTEMACS)
 
 install: settings-org init
 
-init: # Init file for initialization
-	cp -r ./init.el $(DOTEMACS)
-
-settings-org: # main configuration
-	cp -r ./settings.org $(DOTEMACS)
 backup:
 	[ -f $(DOTEMACS)/exwm-config.el ] && cp $(DOTEMACS)/exwm-config.el .
-	cp -r $(DOTEMACS)/init.el .
-	cp -r $(DOTEMACS)/settings.org .
+	$(copy) $(DOTEMACS)/init.el .
+	$(copy) $(DOTEMACS)/settings.org .
 exwm-config:
-	cp -r exwm-config.el $(DOTEMACS)/exwm-config.el
+	$(copy) ./src/exwm-config.el $(DOTEMACS)/exwm-config.el
 
