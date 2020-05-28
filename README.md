@@ -9,7 +9,6 @@
   - Icon: all-the-icons
   - Auto-complete: company-mode,Tabnine
   - Assembly: nasm-mode
-  - Python: elpy
   - Version Control: magit
   - Terminal Emulator: Vterm
   - Lang: golang,python,asm,C/C++,LaTeX
