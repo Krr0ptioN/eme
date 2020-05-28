@@ -382,9 +382,9 @@
 
 *** Clang mode
 **** Add the cc-mode
- #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
     (require 'cc-mode)
- #+END_SRC
+     #+END_SRC
 
 **** Tab size
  #+BEGIN_SRC emacs-lisp
@@ -414,11 +414,11 @@
 
 **** Keybinding
 	   #+BEGIN_SRC emacs-lisp
-       (key-chord-define c-mode-map ";;"  "\C-e;")
+	   (key-chord-define cc-mode-map ";;"  "\C-e;")
 	   #+END_SRC 
-       #+BEGIN_SRC emacs-lisp
-       (key-chord-define c-mode-map "{}"  "{\n\n}\C-p\t")
-       #+END_SRC
+           #+BEGIN_SRC emacs-lisp
+           (key-chord-define cc-mode-map "{}"  "{\n\n}\C-p\t")
+           #+END_SRC
       
 *** Golang mode
 **** Ensure the go specific autocomplete is active in go-mode
@@ -541,16 +541,29 @@
 
 ** Keybinding
 
-    | Key       | Description              |
-    |-----------+--------------------------|
-    | C-S-up    | swap line to up          |
-    | C-S-down  | swap line to down        |
-    | F8        | Google Translate         |
-    | C-S-left  | Indent and shift to left |
-    | C-S-right | Indent and shift to righ |
-    | F6        | Neotree Toggle           |
-    | F7        | Terminal                 |
-    | C-x g     | Magit                    |
+    | Key        | Description                             |
+    |------------+-----------------------------------------|
+    | C-S-up     | swap line to up                         |
+    | C-S-down   | swap line to down                       |
+    | C-S-left   | Indent and shift to left                |
+    | C-S-right  | Indent and shift to right               |
+    | C-x g      | Magit                                   |
+    | C-c t      | Modeline toggle                         |
+    | C-c r      | Reload config file                      |
+    | C-=        | Expand region                           |
+    | C-x C-m    | Man page                                |
+    | ---------- | -------------------------------         |
+    | C-S-c      | multiple-cursor/edit-lines              |
+    | C->        | multiple-cursor/mark-next-like-this     |
+    | C-<        | multiple-cursor/mark-previous-like-this |
+    | C-c C-<    | multiple-cursor/editmark-all-like-this  |
+    | ---------- | -------------------------------         |
+    | M-Return   | Execute command in background           |
+    | M-n        | Line numbers toggle                     |
+    | F6         | Neotree Toggle                          |
+    | F7         | Terminal                                |
+    | F8         | Google Translate                        |
+    |            |                                         |
 
 *** Shift the line to up or down
    #+BEGIN_SRC emacs-lisp
@@ -602,7 +615,7 @@
    (use-package multiple-cursors
    :ensure t
    :config
-   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+   (global-set-key (kbd "C-S-c") 'mc/edit-lines)
    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
    (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
@@ -622,21 +635,22 @@
     #+END_SRC
 *** Reload config
     #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "C-c r") 'config-reload)
+        (global-set-key (kbd "C-c r") 'config-reload)
     #+END_SRC
-*** Brightness
-**** Increase
+*** EXWM
+**** Brightness
+***** Increase
+      #+BEGIN_SRC emacs-lisp
+      ;     (global-set-key (kbd "<XF86MonBrightnessUp>") 'increase-brightness)
+      #+END_SRC
+***** Decrease
+      #+BEGIN_SRC emacs-lisp
+      ;     (global-set-key (kbd "<XF86MonBrightnessDown>") 'decrease-brightness)
+      #+END_SRC
+**** Take screenshot
      #+BEGIN_SRC emacs-lisp
-     ;     (global-set-key (kbd "<XF86MonBrightnessUp>") 'increase-brightness)
+     ;(global-set-key (kbd "s-p") 'take-screenshot)
      #+END_SRC
-**** Decrease
-     #+BEGIN_SRC emacs-lisp
-     ;     (global-set-key (kbd "<XF86MonBrightnessDown>") 'decrease-brightness)
-     #+END_SRC
-*** Take screenshot
-    #+BEGIN_SRC emacs-lisp
-    ;(global-set-key (kbd "s-p") 'take-screenshot)
-    #+END_SRC
 *** Execute command
     #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "<M-return>")
