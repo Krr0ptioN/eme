@@ -250,25 +250,6 @@
 	(global-display-line-numbers-mode)	
 	#+END_SRC
 
-*** Centaur Tab
-	#+BEGIN_SRC emacs-lisp
-	;(use-package centaur-tabs
-	;	:ensure t
-  	;	:config
-  	;	(centaur-tabs-mode t)
-	;	(centaur-tabs-headline-match)
-	;	(setq centaur-tabs-style "wave")
-	;;	(setq centaur-tabs-set-icons t)
-	;	(setq centaur-tabs-plain-icons t)
-	;	(setq centaur-tabs-gray-out-icons 'buffer)
-	;	(setq centaur-tabs-set-bar 'over)
-	;	(setq centaur-tabs-close-button "X")
-	;	(setq centaur-tabs-modified-marker "*")
-  	;	:bind
-  	;	("C-<prior>" . centaur-tabs-backward)
-  	;	("C-<next>" . centaur-tabs-forward))
-	#+END_SRC
-
 *** Icon
 	#+BEGIN_SRC emacs-lisp
 	(use-package all-the-icons
@@ -569,6 +550,7 @@
     | C-S-right | Indent and shift to righ |
     | F6        | Neotree Toggle           |
     | F7        | Terminal                 |
+    | C-x g     | Magit                    |
 
 *** Shift the line to up or down
    #+BEGIN_SRC emacs-lisp
