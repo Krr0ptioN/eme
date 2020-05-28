@@ -11,7 +11,7 @@ settings-org: # main configuration
 install: settings-org init
 
 backup:
-	[ -f $(DOTEMACS)/exwm-config.el ] && cp $(DOTEMACS)/exwm-config.el .
+	[ -f $(DOTEMACS)/exwm-config.el ] && $(copy) $(DOTEMACS)/exwm-config.el .
 	$(copy) $(DOTEMACS)/init.el .
 	$(copy) $(DOTEMACS)/settings.org .
 exwm-config:
