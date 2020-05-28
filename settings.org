@@ -661,4 +661,4 @@
       	      (lambda (command)
       		(interactive (list (read-shell-command "➜ ")))
       		(start-process-shell-command command nil command)))
-    #+END_SRC  
+    #+END_SRC
