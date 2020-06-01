@@ -1,0 +1,685 @@
+* Custom Function
+** Fast forward
+  #+BEGIN_SRC emacs-lisp
+  (defun forward-symbol-shift-aware (arg)
+  (interactive "^p")
+  (forward-symbol arg))
+  #+END_SRC
+
+** Swap line
+   #+BEGIN_SRC emacs-lisp
+(defun move-text-internal (arg)
+   (cond
+    ((and mark-active transient-mark-mode)
+     (if (> (point) (mark))
+            (exchange-point-and-mark))
+     (let ((column (current-column))
+              (text (delete-and-extract-region (point) (mark))))
+       (forward-line arg)
+       (move-to-column column t)
+       (set-mark (point))
+       (insert text)
+       (exchange-point-and-mark)
+       (setq deactivate-mark nil)))
+    (t
+     (beginning-of-line)
+     (when (or (> arg 0) (not (bobp)))
+       (forward-line)
+       (when (or (< arg 0) (not (eobp)))
+            (transpose-lines arg))
+       (forward-line -1)))))
+
+(defun move-text-down (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines down."
+   (interactive "*p")
+   (move-text-internal arg))
+
+(defun move-text-up (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines up."
+   (interactive "*p")3
+   (move-text-internal (- arg)))
+
+(windmove-default-keybindings 'meta)
+ ;; Shift the selected region right if distance is postive, left if
+ ;; negative
+
+ (defun shift-region (distance)
+  (let ((mark (mark)))
+    (save-excursion
+      (indent-rigidly (region-beginning) (region-end) distance)
+       (push-mark mark t t)
+       ;; Tell the command loop not to deactivate the mark
+       ;; for transient mark mode
+       (setq deactivate-mark nil))))
+   (defun shift-right ()
+     (interactive)
+	 (shift-region 1))
+   (defun shift-left ()
+     (interactive)
+	 (shift-region -1))
+   #+END_SRC 
+
+** Reload
+   #+BEGIN_SRC emacs-lisp
+   (defun reload ()
+       "Revert buffer, then restore previous position."
+       (interactive)
+       (let ((pt  (point)))
+       (revert-buffer t t)
+       (goto-char pt)))
+   #+END_SRC 
+
+** file
+   #+BEGIN_SRC emacs-lisp
+(defun add-to-alist (symbol name value)
+  "Add new pair to ALIST"
+  (let* ((list (symbol-value symbol))
+         (pair (assoc name list)))
+    (if pair
+        (setcdr pair value)
+      (let ((pair (cons name value)))
+        (if list
+            (setf (symbol-value symbol) (cons pair list))
+          (setf (symbol-value symbol) (cons pair nil)))))
+    (symbol-value symbol)))
+
+(defun remove-alist (symbol name)
+  "Remove pair from ALIST"
+  (let* ((list (symbol-value symbol))
+         (pair (assoc name list)))
+    (if pair
+        (let ((ptr list))
+          (if (eq (caar ptr) name)
+              (setf (symbol-value symbol) '())
+            (while ptr
+              (if (eq (caadr ptr) name)
+                  (progn
+                    (setcdr ptr (cddr ptr))
+                    (setq ptr nil))
+                (setq ptr (cdr ptr))))
+            list)))))
+
+(require 'filenotify)
+
+  (defun kill-all-dired-buffers ()
+      "Kill all dired buffers."
+
+      (interactive)
+      (save-excursion
+        (let ((count 0))
+          (dolist (buffer (buffer-list))
+            (set-buffer buffer)
+            (when (equal major-mode 'dired-mode)
+              (setq count (1+ count))
+              (kill-buffer buffer)))
+          (message "Killed %i dired buffer(s)." count))))
+
+(setq file-watchers '())
+
+
+(defun watch ()
+  "Function watch file changes and reload the file from buffer"
+  (interactive)
+  (let* ((fname (buffer-file-name))
+         (pair (assoc fname file-watchers)))
+    (if pair
+        (progn
+          (file-notify-rm-watch (cdr pair))
+          (remove-alist 'file-watchers descritor)))
+
+    (let ((descriptor (file-notify-add-watch fname
+                                             '(change)
+                                             (lexical-let ((filename fname))
+                                               (lambda (event)
+                                                 (with-current-buffer (get-file-buffer filename)
+                                                   (if (not (buffer-modified-p))
+                                                       (progn
+                                                         (message "update %s" filename)
+                                                         (reload)))))))))
+      (add-to-alist 'file-watchers fname descriptor))))
+   #+END_SRC
+   
+** Take screenshot
+   #+BEGIN_SRC emacs-lisp
+   (defun take-screenshot ()
+   "Flameshot."
+   (interactive)
+   (call-process-shell-command "flameshot gui" nil 0))
+   #+END_SRC
+** decrease brightness
+ #+BEGIN_SRC emacs-lisp
+ (defun decrease-brightness ()
+ "decrease brightness."
+ (interactive)
+ (call-process-shell-command "brightnessctl s 20-" nil 0))
+ #+END_SRC
+** increase brightness
+   #+BEGIN_SRC emacs-lisp
+ (defun increase-brightness ()
+ "increase brightness."
+ (interactive)
+ (call-process-shell-command "brightnessctl s 20+" nil 0))
+ #+END_SRC
+
+* Settings
+** Melpa repo
+   #+BEGIN_SRC emacs-lisp
+   (require 'package)
+   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+   (package-initialize)
+   #+END_SRC
+
+** Appearance
+*** Disable the menu bar
+    #+BEGIN_SRC emacs-lisp
+    (menu-bar-mode 0)
+    #+END_SRC
+
+*** Disable the tool bar
+    #+BEGIN_SRC emacs-lisp
+    (tool-bar-mode 0)
+    #+END_SRC
+
+*** Disable the scroll bar
+    #+BEGIN_SRC emacs-lisp
+    (scroll-bar-mode -1)
+    #+END_SRC
+
+*** Disable the start splesh screen
+   #+BEGIN_SRC emacs-lisp
+   (setq inhibit-startup-screen t)
+   #+END_SRC
+
+*** Visual select background color
+   #+BEGIN_SRC emacs-lisp
+   (set-face-attribute 'region nil :background "#666")
+   #+END_SRC
+
+*** ido vertical mode
+   #+BEGIN_SRC emacs-lisp
+   (ido-mode)
+   (use-package ido-vertical-mode
+   :ensure t
+   :config
+      (ido-mode 1)
+      (ido-vertical-mode 1)
+      (setq ido-vertical-define-keys 'C-n-and-C-p-only))
+   #+END_SRC
+
+*** Auto close the mark
+  #+BEGIN_SRC emacs-lisp
+	(electric-pair-mode 1)
+  #+END_SRC
+
+*** Safe mode for themes
+    #+BEGIN_SRC emacs-lisp
+    (setq custom-safe-themes t)
+	#+END_SRC
+
+*** Show line number
+	#+BEGIN_SRC emacs-lisp
+	(setq doc-view-continuous t)
+	(global-display-line-numbers-mode)	
+	#+END_SRC
+
+*** Font
+**** Encoding
+	 #+BEGIN_SRC emacs-lisp
+	 (set-language-environment "UTF-8")
+	 (set-default-coding-systems 'utf-8)
+	 #+END_SRC
+
+**** Display font
+	#+BEGIN_SRC emacs-lisp
+	(set-default-font "Fira Code-9")
+	;(use-package fira-code-mode
+	;:ensure t 
+	;:config (global-fira-code-mode))
+	#+END_SRC
+
+**** Prettify font
+	 #+BEGIN_SRC emacs-lisp
+
+	   (global-prettify-symbols-mode 1)
+	   ;(global-pretty-mode 1)
+
+	   (setq prettify-symbols-alist
+	   '(("lambda" . 955) ; λ
+	    ("->" . 8594)    ; →
+	    ("=>" . 8658)    ; ⇒
+	    ("map" . 27fc)    ; ↦ 
+	    )) 
+	    (add-hook
+	       'python-mode-hook
+	       (lambda ()
+		  (mapc (lambda (pair) (push pair prettify-symbols-alist))
+		  '(;; Syntax
+		  ("return" . 27fc)
+		   ("yield" .  27fb)
+		   ("for" .    2200)))))
+	    ;; (pretty-deactivate-groups
+	    ;; '(:equality :ordering :ordering-double :ordering-triple
+	    ;;    :arrows :arrows-twoheaded :punctuation))
+
+	    ;; (pretty-activate-groups
+	    ;; '(:sub-and-superscripts :greek :arithmetic-nary))
+
+	 #+END_SRC
+
+	 #+RESULTS:
+
+
+*** Icon
+	#+BEGIN_SRC emacs-lisp
+	(use-package all-the-icons
+	:ensure t)
+	#+END_SRC
+
+*** Cursor
+**** Charater
+	 * Change cursor block to |-Bleam
+	 #+BEGIN_SRC emacs-lisp
+	 (setq-default cursor-type 'bar)
+	 #+END_SRC
+
+**** Highlight current line
+	 #+BEGIN_SRC emacs-lisp
+	 (global-hl-line-mode 1)
+	 #+END_SRC
+
+*** Themes 
+**** Load theme
+	#+BEGIN_SRC emacs-lisp
+	  ;(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+	  (use-package doom-themes
+	  :ensure t
+	  ;:config
+	  ;; load Molokai theme
+	  ;(load-theme 'doom-molokai)
+	  ;; Org mode 
+	  ;(doom-themes-org-config))
+	  )
+	  ;; (use-package base16-theme
+	  ;; ;:ensure t
+	  ;; ;:config
+	  ;; ;(load-theme 'base16-classic-dark)
+	  ;; ;(load-theme 'base16-black-metal-venom)
+	  ;; )
+	  (load-theme 'gruber-darker)
+	#+END_SRC
+
+**** Neotree theme
+	#+BEGIN_SRC emacs-lisp
+	(use-package neotree :ensure t)
+	(doom-themes-neotree-config)
+	#+END_SRC
+
+**** Mode line
+	#+BEGIN_SRC emacs-lisp
+	(use-package doom-modeline
+	:ensure t)
+	(doom-modeline-mode 2)
+	(setq doom-modeline-height 1)
+	(fancy-battery-mode)
+	#+END_SRC	
+
+*** Dashboard
+  #+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+  :ensure t
+  :diminish dashboard-mode
+  :config
+  (setq dashboard-center-content t)
+  (setq dashboard-startup-banner 3)
+  (setq dashboard-banner-logo-title "EME")
+  (setq dashboard-items '((recents  . 10)
+  (bookmarks . 10)))
+  (setq dashboard-set-navigator t)
+  (dashboard-setup-startup-hook))
+  #+END_SRC
+ 
+** Mode
+*** Org Mode
+**** Keyword used in todo file and org-mode
+    #+BEGIN_SRC emacs-lisp
+	(setq org-todo-keywords
+	'((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+    #+END_SRC
+
+**** Bullets
+    #+BEGIN_SRC emacs-lisp
+    (use-package org-bullets
+       :ensure t
+	   :config
+	   (add-hook 'org-mode-hook (lambda ()
+	   (org-bullets-mode 1))))
+    #+END_SRC
+
+**** Babel
+     #+BEGIN_SRC emacs-lisp
+     (org-babel-do-load-languages 'org-babel-load-languages
+     '((shell . t)))
+
+     #+END_SRC
+**** Keybinding
+***** fill the check bos in org-mode
+     #+BEGIN_SRC emacs-lisp
+     (global-set-key [f5] 'org-toggle-checkbox)
+     #+END_SRC
+*** Tabnine
+    #+BEGIN_SRC emacs-lisp
+    (use-package company-tabnine :ensure t)
+    (add-to-list 'company-backends #'company-tabnine)
+      ;; ;; Trigger completion immediately.
+      (setq company-idle-delay 0)
+      ;; ;; Number the candidates (use M-1, M-2 etc to select completions).
+      (setq company-show-numbers t)
+      (add-hook 'after-init-hook 'global-company-mode)
+
+    #+END_SRC
+
+*** Assembly mode
+    #+BEGIN_SRC emacs-lisp
+    (add-to-list 'auto-mode-alist '("\\.asm\\'" . nasm-mode))
+    (defun my-asm-mode-hook ()
+      ;; Indent
+      (company-mode)
+      (setq tab-always-indent 8))
+      (add-hook 'nasm-mode-hook #'my-asm-mode-hook)
+    #+END_SRC
+   
+*** Google translate
+    * English & Kurdish(kurmanji)
+    #+BEGIN_SRC emacs-lisp
+    (use-package google-translate
+    :ensure t
+    :config
+    (setq google-translate-translation-directions-alist
+    '(("en" . "ku") ("ku" . "en") ))
+    (global-set-key [f8] 'google-translate-smooth-translate))
+    #+END_SRC
+
+*** Clang mode
+**** Add the cc-mode
+     #+BEGIN_SRC emacs-lisp
+    (require 'cc-mode)
+     #+END_SRC
+
+**** Tab size
+ #+BEGIN_SRC emacs-lisp
+ (setq-default c-basic-offset 8 c-default-style "linux")
+ (setq-default tab-width 8 indent-tabs-mode t)
+ (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+ #+END_SRC
+
+**** Auto complete
+   #+BEGIN_SRC emacs-lisp
+   (use-package auto-complete-clang
+   :ensure t
+   :config
+   (define-key c++-mode-map (kbd "C-S-<return>") 'ac-complete-clang)
+   (require 'auto-complete-config))
+   (ac-config-default)
+   #+END_SRC 
+
+**** Yasnippet
+   #+BEGIN_SRC emacs-lisp
+   (use-package yasnippet-snippets
+   :ensure t
+   :config
+   (yas-global-mode 1))
+   (global-flycheck-mode)
+   #+END_SRC
+
+**** Keybinding
+	   #+BEGIN_SRC emacs-lisp
+	   (key-chord-define c-mode-map ";;"  "\C-e;")
+	   #+END_SRC 
+           #+BEGIN_SRC emacs-lisp
+           (key-chord-define c-mode-map "{}"  "{\n\n}\C-p\t")
+           #+END_SRC
+*** Rust mode
+    #+BEGIN_SRC emacs-lisp
+    (use-package rust-mode :ensure t)
+    #+END_SRC 
+*** Golang mode :comment
+**** Ensure the go specific autocomplete is active in go-mode
+      #+BEGIN_SRC emacs-lisp
+      ;(use-package go-autocomplete
+      ;:ensure t)
+      ;(with-eval-after-load 'go-mode
+      ;(require 'go-autocomplete))
+      #+END_SRC
+**** PATH
+     #+BEGIN_SRC emacs-lisp
+     ;(use-package exec-path-from-shell
+     ;:ensure t)
+     ;(when (memq window-system '(mac ns x))
+     ;      (exec-path-from-shell-initialize)
+     ;      (exec-path-from-shell-copy-env "GOPATH"))
+     #+END_SRC
+
+**** guru settings
+     #+BEGIN_SRC emacs-lisp
+       ;; (use-package go-guru
+       ;; :ensure t
+       ;; )
+       ;; (go-guru-hl-identifier-mode)
+     #+END_SRC
+
+**** Keybinding
+***** Go to definition
+    #+BEGIN_SRC emacs-lisp
+    ;(local-set-key (kbd "M-.") 'godef-jump)
+    #+END_SRC
+
+***** Return from whence you came
+    #+BEGIN_SRC emacs-lisp
+    ;(local-set-key (kbd "M-*") 'pop-tag-mark)
+    #+END_SRC
+***** Invoke compiler
+       #+BEGIN_SRC emacs-lisp
+       ;(local-set-key (kbd "M-p") 'compile) 
+       #+END_SRC
+
+***** Redo most recent compile cmd
+    #+BEGIN_SRC emacs-lisp
+    ;(local-set-key (kbd "M-P") 'recompile)
+    #+END_SRC
+***** Error
+****** Go to next error (or msg)
+	#+BEGIN_SRC emacs-lisp
+	;(local-set-key (kbd "M-]") 'next-error) 
+	#+END_SRC
+
+****** Go to previous error or msg
+	#+BEGIN_SRC emacs-lisp
+	 ; (local-set-key (kbd "M-[") 'previous-error)
+	#+END_SRC
+
+**** Go documentation
+     #+BEGIN_SRC emacs-lisp
+       ;; (add-hook 'go-mode-hook '(lambda ()
+       ;; (local-set-key (kbd "C-c C-k") 'godoc)))
+       ;; (add-hook 'go-mode-hook 'company-mode)
+       ;; (add-hook 'go-mode-hook (lambda ()
+       ;; (set (make-local-variable 'company-backends) '(company-go))
+       ;; (company-mode)))
+     #+END_SRC 
+ 
+**** HOOK
+     #+BEGIN_SRC emacs-lisp
+       ;; (add-hook 'go-mode-hook 'extin-go-mode-hook)
+     #+END_SRC
+*** Markdown
+    #+BEGIN_SRC emacs-lisp
+    (use-package markdown-mode
+    :ensure t)
+    #+END_SRC
+*** LaTeX mode
+*** Python mode
+**** Elpy
+     #+BEGIN_SRC emacs-lisp
+     (use-package elpy
+     :ensure t
+     :init
+     (elpy-enable))
+
+     #+END_SRC
+**** Python shell
+     #+BEGIN_SRC emacs-lisp
+     (setq python-shell-interpreter "ipython"
+       python-shell-interpreter-args "-i --simple-prompt")
+
+     #+END_SRC 
+**** Ipython
+     #+BEGIN_SRC emacs-lisp
+     (use-package ein :ensure t)
+     (use-package ob-ipython :ensure t)
+     #+END_SRC
+*** Powershell 
+    #+BEGIN_SRC emacs-lisp
+    (use-package powershell
+    :ensure t)
+    #+END_SRC
+*** Magit
+**** Keybinding
+***** Open status
+    #+BEGIN_SRC emacs-lisp
+    (use-package magit
+    :ensure t
+    :config
+    (global-set-key (kbd "C-x g") 'magit-status))
+    #+END_SRC
+*** Terminal Emulators
+    #+BEGIN_SRC emacs-lisp
+    (use-package vterm :ensure t)
+    (add-hook 'vterm-mode (lambda () (linum-mode -1)))
+    #+END_SRC
+*** Sudo edit
+    #+BEGIN_SRC emacs-lisp
+    (use-package sudo-edit
+    :ensure t
+    :bind
+    ("M-S-o" . sudo-edit))
+    #+END_SRC
+
+** Keybinding
+
+    | Key       | Description                             |
+    |-----------+-----------------------------------------|
+    | C-S-up    | swap line to up                         |
+    | C-S-down  | swap line to down                       |
+    | C-S-left  | Indent and shift to left                |
+    | C-S-right | Indent and shift to right               |
+    | C-x g     | Magit                                   |
+    | C-c t     | Modeline toggle                         |
+    | C-c r     | Reload config file                      |
+    | C-=       | Expand region                           |
+    | C-x C-m   | Man page                                |
+    | C-S-c     | multiple-cursor/edit-lines              |
+    | C->       | multiple-cursor/mark-next-like-this     |
+    | C-<       | multiple-cursor/mark-previous-like-this |
+    | C-c C-<   | multiple-cursor/editmark-all-like-this  |
+    | M-Return  | Execute command in background            |
+    | M-n       | Line numbers toggle                     |
+    | F6        | Neotree Toggle                          |
+    | F7        | Terminal                                |
+    | F8        | Google Translate                        |
+    |           |                                         |
+
+*** Shift the line to up or down
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key [\C-\S-up] 'move-text-up)
+   (global-set-key [\C-\S-down] 'move-text-down)
+   #+END_SRC 
+
+*** Indent the line to left or right
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key [C-S-right] 'shift-right)
+   (global-set-key [C-S-left] 'shift-left)
+   #+END_SRC
+
+*** Shrink window
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "<M-S-up>") 'shrink-window)
+   (global-set-key (kbd "<M-S-down>") 'enlarge-window)
+   #+END_SRC
+
+*** Srink horizontally window
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "<M-S-left>") 'shrink-window-horizontally)
+   (global-set-key (kbd "<M-S-right>") 'enlarge-window-horizontally)
+   #+END_SRC
+
+*** Neotree toggle
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key [f6] 'neotree-toggle)
+   #+END_SRC
+
+*** Toggle for line number
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "M-n") 'display-line-numbers-mode)
+   #+END_SRC
+
+*** Man page
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "C-x C-m") 'man)
+   #+END_SRC
+
+*** Move betwen word
+    #+BEGIN_SRC emacs-lisp
+    (local-set-key (kbd "C-<right>") 'forward-symbol-shift-aware)
+    (local-set-key (kbd "C-<left>") (lambda () (interactive "^")
+                               (forward-symbol-shift-aware -1)))
+    #+END_SRC 
+*** Multiple Cusor
+   #+BEGIN_SRC emacs-lisp
+   (use-package multiple-cursors
+   :ensure t
+   :config
+   (global-set-key (kbd "C-S-c") 'mc/edit-lines)
+   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
+   #+END_SRC
+*** Expand Region
+    #+BEGIN_SRC emacs-lisp
+    (use-package expand-region :ensure t)
+    (global-set-key (kbd "C-=") 'er/expand-region)
+    #+END_SRC 
+*** Modeline Toggle
+    #+BEGIN_SRC emacs-lisp    
+    (global-set-key (kbd "C-c t") 'doom-modeline-mode)
+    #+END_SRC
+*** Terminal
+    #+BEGIN_SRC emacs-lisp
+    (global-set-key [f7] 'vterm)
+    #+END_SRC
+*** Reload config
+    #+BEGIN_SRC emacs-lisp
+        (global-set-key (kbd "C-c r") 'config-reload)
+    #+END_SRC
+*** EXWM
+**** Brightness
+***** Increase
+      #+BEGIN_SRC emacs-lisp
+      ;     (global-set-key (kbd "<XF86MonBrightnessUp>") 'increase-brightness)
+      #+END_SRC
+***** Decrease
+      #+BEGIN_SRC emacs-lisp
+      ;     (global-set-key (kbd "<XF86MonBrightnessDown>") 'decrease-brightness)
+      #+END_SRC
+**** Take screenshot
+     #+BEGIN_SRC emacs-lisp
+     ;(global-set-key (kbd "s-p") 'take-screenshot)
+     #+END_SRC
+*** Execute command
+    #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "<M-return>")
+      	      (lambda (command)
+      		(interactive (list (read-shell-command "➜ ")))
+      		(start-process-shell-command command nil command)))
+    #+END_SRC

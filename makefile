@@ -7,7 +7,6 @@ init:
 
 settings-org: # main configuration
 	$(copy) ./src/settings.org $(DOTEMACS)
-
 install: settings-org init
 
 backup:
