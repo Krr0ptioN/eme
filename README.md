@@ -11,7 +11,7 @@
   - Assembly: nasm-mode
   - Version Control: magit
   - Terminal Emulator: Vterm
-  - Lang: golang,python,asm,C/C++,LaTeX
+  - Lang: python,asm,C/C++,LaTeX,lisp
 ## Install 
 ```sh
 make install
