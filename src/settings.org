@@ -1,4 +1,4 @@
-* Custom Function
+* Function
 ** Fast forward
   #+BEGIN_SRC emacs-lisp
   (defun forward-symbol-shift-aware (arg)
@@ -173,9 +173,9 @@
 
 ** Appearance
 *** Disable the menu bar
-    #+BEGIN_SRC emacs-lisp
-    (menu-bar-mode 0)
-    #+END_SRC
+     #+BEGIN_SRC emacs-lisp
+     (menu-bar-mode 0)
+     #+END_SRC
 
 *** Disable the tool bar
     #+BEGIN_SRC emacs-lisp
@@ -247,7 +247,11 @@
 *** Show line number
 	#+BEGIN_SRC emacs-lisp
 	(setq doc-view-continuous t)
-	(global-display-line-numbers-mode)	
+	(use-package linum-relative
+	:ensure t
+	:config
+	(setq linum-relative-backend 'display-line-numbers-mode)
+	(linum-relative-mode))
 	#+END_SRC
 
 *** Icon
@@ -286,22 +290,38 @@
 	  ;; ;(load-theme 'base16-classic-dark)
 	  ;; ;(load-theme 'base16-black-metal-venom)
 	  ;; )
-	  (load-theme 'gruber-darker)
-	#+END_SRC
+	  (use-package gruber-darker-theme
+	  :ensure t
+	  :config 
+	  ;	  (load-theme 'gruber-darker))
+	  )
+	  (use-package badwolf-theme
+	  :ensure t
+	  :config
+	  (load-theme 'badwolf))
 
+
+	#+END_SRC
 **** Neotree theme
 	#+BEGIN_SRC emacs-lisp
-	(use-package neotree :ensure t)
-	(doom-themes-neotree-config)
+	(use-package neotree :ensure t
+	:config
+	(doom-themes-neotree-config))
 	#+END_SRC
 
-**** Mode line
+**** Modeline
 	#+BEGIN_SRC emacs-lisp
 	(use-package doom-modeline
-	:ensure t)
-	(doom-modeline-mode 2)
+	:ensure t
+	:config
 	(setq doom-modeline-height 1)
-	(fancy-battery-mode)
+	;	(doom-modenline-mode)
+	)
+
+	(use-package fancy-battery
+	:ensure t
+	:config
+	(fancy-battery-mode))
 	#+END_SRC	
 
 *** Dashboard
@@ -383,14 +403,14 @@
 *** Clang mode
 **** Add the cc-mode
      #+BEGIN_SRC emacs-lisp
-    (require 'cc-mode)
+     ;(require 'cc-mode)
      #+END_SRC
 
 **** Tab size
  #+BEGIN_SRC emacs-lisp
  (setq-default c-basic-offset 8 c-default-style "linux")
  (setq-default tab-width 8 indent-tabs-mode t)
- (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+ ; (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
  #+END_SRC
 
 **** Auto complete
@@ -398,8 +418,8 @@
    (use-package auto-complete-clang
    :ensure t
    :config
-   (define-key c++-mode-map (kbd "C-S-<return>") 'ac-complete-clang)
-   (require 'auto-complete-config))
+  ; (define-key c++-mode-map (kbd "C-S-<return>") 'ac-complete-clang)
+  )
    (ac-config-default)
    #+END_SRC 
 
@@ -414,10 +434,10 @@
 
 **** Keybinding
 	   #+BEGIN_SRC emacs-lisp
-	   (key-chord-define cc-mode-map ";;"  "\C-e;")
+	   ;(key-chord-define cc-mode-map ";;"  "\C-e;")
 	   #+END_SRC 
            #+BEGIN_SRC emacs-lisp
-           (key-chord-define cc-mode-map "{}"  "{\n\n}\C-p\t")
+           ;(key-chord-define cc-mode-map "{}"  "{\n\n}\C-p\t")
            #+END_SRC
       
 *** Golang mode
@@ -594,7 +614,8 @@
 
 *** Toggle for line number
    #+BEGIN_SRC emacs-lisp
-   (global-set-key (kbd "M-n") 'display-line-numbers-mode)
+   ;(global-set-key (kbd "M-n") 'display-line-numbers-mode)
+   (global-set-key (kbd "M-n") 'linum-relative-toggle)
    #+END_SRC
 
 *** Man page

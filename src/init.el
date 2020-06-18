@@ -13,3 +13,4 @@
 ;; Startup file
 ;(Find-file "~/dotfile/.todo.org")
 (put 'scroll-left 'disabled nil)
+(put 'upcase-region 'disabled nil)
