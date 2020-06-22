@@ -1,7 +1,7 @@
 
 DOTEMACS=~/.emacs.d
 copy = cp -r
-
+remove = rm -rf
 init:
 	$(copy) ./src/init.el $(DOTEMACS)
 
@@ -12,10 +12,8 @@ install: settings-org init
 backup:
 	$(copy) $(DOTEMACS)/init.el ./src/
 	$(copy) $(DOTEMACS)/settings.org ./src/
-exwm-config:
-	$(copy) ./src/exwm-config.el $(DOTEMACS)/exwm-config.el
 
 clean:
-	rm -rf $(DOTEMACS)/{settings.org,init.el,exwm-config.el}
+	$(remove) $(DOTEMACS)/{settings.org,init.el}
 purge:
-	rm -rf $(DOTEMACS)
+	$(remove) $(DOTEMACS)
