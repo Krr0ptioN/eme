@@ -48,7 +48,8 @@
  (defun shift-region (distance)
   (let ((mark (mark)))
     (save-excursion
-      (indent-rigidly (region-beginning) (region-end) distance)
+
+    (indent-rigidly (region-beginning) (region-end) distance)
        (push-mark mark t t)
        ;; Tell the command loop not to deactivate the mark
        ;; for transient mark mode
@@ -151,18 +152,28 @@
 ** decrease brightness
  #+BEGIN_SRC emacs-lisp
  (defun decrease-brightness ()
- "decrease brightness."
- (interactive)
- (call-process-shell-command "brightnessctl s 20-" nil 0))
- #+END_SRC
+   "decrease brightness."
+   (interactive)
+   (call-process-shell-command "brightnessctl s 20-" nil 0))
+  #+END_SRC
 ** increase brightness
    #+BEGIN_SRC emacs-lisp
- (defun increase-brightness ()
- "increase brightness."
- (interactive)
- (call-process-shell-command "brightnessctl s 20+" nil 0))
- #+END_SRC
-
+   (defun increase-brightness ()
+     "increase brightness."
+     (interactive)
+     (call-process-shell-command "brightnessctl s 20+" nil 0))
+   #+END_SRC
+** Scroll UP and DOWN
+  #+BEGIN_SRC emacs-lisp
+  ; DOWN
+  (defun gcm-scroll-down ()
+     (interactive)
+     (scroll-up 3))
+  ; UP
+  (defun gcm-scroll-up ()
+     (interactive)
+     (scroll-down 3))
+  #+END_SRC
 * Settings
 ** Melpa repo
    #+BEGIN_SRC emacs-lisp
@@ -561,27 +572,29 @@
 
 ** Keybinding
 
-    | Key        | Description                             |
-    |------------+-----------------------------------------|
-    | C-S-up     | swap line to up                         |
-    | C-S-down   | swap line to down                       |
-    | C-S-left   | Indent and shift to left                |
-    | C-S-right  | Indent and shift to right               |
-    | C-x g      | Magit                                   |
-    | C-c t      | Modeline toggle                         |
-    | C-c r      | Reload config file                      |
-    | C-=        | Expand region                           |
-    | C-x C-m    | Man page                                |
-    | C-S-c      | multiple-cursor/edit-lines              |
-    | C->        | multiple-cursor/mark-next-like-this     |
-    | C-<        | multiple-cursor/mark-previous-like-this |
-    | C-c C-<    | multiple-cursor/editmark-all-like-this  |
-    | M-Return   | Execute command in background           |
-    | M-n        | Line numbers toggle                     |
-    | F6         | Neotree Toggle                          |
-    | F7         | Terminal                                |
-    | F8         | Google Translate                        |
-    |            |                                         |
+    | Key       | Description                             |
+    |-----------+-----------------------------------------|
+    | C-S-up    | swap line to up                         |
+    | C-S-down  | swap line to down                       |
+    | C-S-left  | Indent and shift to left                |
+    | C-S-right | Indent and shift to right               |
+    | C-x g     | Magit                                   |
+    | C-c t     | Modeline toggle                         |
+    | C-c r     | Reload config file                      |
+    | C-=       | Expand region                           |
+    | C-x C-m   | Man page                                |
+    | C-S-c     | multiple-cursor/edit-lines              |
+    | C->       | multiple-cursor/mark-next-like-this     |
+    | C-<       | multiple-cursor/mark-previous-like-this |
+    | C-c C-<   | multiple-cursor/editmark-all-like-this  |
+    | M-Return  | Execute command in background           |
+    | C-x n     | Line numbers toggle                     |
+    | F6        | Neotree Toggle                          |
+    | F7        | Terminal                                |
+    | F8        | Google Translate                        |
+    | M-n       | scroll down                             |
+    | M-p       | scroll up                               |
+
 
 *** Shift the line to up or down
    #+BEGIN_SRC emacs-lisp
@@ -614,8 +627,7 @@
 
 *** Toggle for line number
    #+BEGIN_SRC emacs-lisp
-   ;(global-set-key (kbd "M-n") 'display-line-numbers-mode)
-   (global-set-key (kbd "M-n") 'linum-relative-toggle)
+   (global-set-key (kbd "C-x n") 'linum-relative-toggle)
    #+END_SRC
 
 *** Man page
@@ -676,4 +688,9 @@
       	      (lambda (command)
       		(interactive (list (read-shell-command "➜ ")))
       		(start-process-shell-command command nil command)))
+    #+END_SRC
+*** Scroll Slowly
+    #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "M-n") 'gcm-scroll-down)
+    (global-set-key (kbd "M-p")   'gcm-scroll-up)
     #+END_SRC
