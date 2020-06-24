@@ -403,6 +403,14 @@
 
 *** Assembly mode
     #+BEGIN_SRC emacs-lisp
+
+    (use-package nasm-mode
+    :ensure t)
+    (use-package mips-mode
+    :ensure t)
+    (use-package masm-mode
+    :ensure t)
+
     (add-to-list 'auto-mode-alist '("\\.asm\\'" . nasm-mode))
     (defun my-asm-mode-hook ()
       ;; Indent

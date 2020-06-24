@@ -6,12 +6,10 @@
   - Modeline: doom
   - Tree: neotree
   - Minimap: sorry no minimap
-  - Icon: all-the-icons
   - Auto-complete: company-mode,Tabnine
-  - Assembly: nasm-mode
+  - Assembly: nasm,mips,masm
   - Version Control: magit
   - Terminal Emulator: Vterm
-  - Lang: python,asm,C/C++,LaTeX,lisp
 ## Install 
 ```sh
 make install
