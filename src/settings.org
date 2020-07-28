@@ -489,12 +489,21 @@
      :ensure t)
      #+END_SRC
 **** Keybinding
-	   #+BEGIN_SRC emacs-lisp
-	   ;(key-chord-define cc-mode-map ";;"  "\C-e;")
-	   #+END_SRC 
-           #+BEGIN_SRC emacs-lisp
-           ;(key-chord-define cc-mode-map "{}"  "{\n\n}\C-p\t")
-           #+END_SRC
+***** Compile
+      #+BEGIN_SRC emacs-lisp
+      (global-set-key (kbd "<f5>") (lambda ()
+      		(interactive)
+		(setq-local compileation-read-command nil)
+		(call-interactively 'compile)))
+      #+END_SRC
+***** Debug(gdb)
+      #+BEGIN_SRC emacs-lisp
+      (setq 
+      		;; use gdb-many-windows by default
+      		gdb-many-windows t
+		;; Non-nil means display source file containing the main routin at startup
+	        Gdb-show-main t)
+      #+END_SRC
 *** Documentation Viewer
     #+BEGIN_SRC emacs-lisp
     (use-package helm-dash
@@ -664,6 +673,7 @@
     | C-c C-<   | multiple-cursor/editmark-all-like-this    |
     | M-Return  | Execute command in background             |
     | C-x n     | Line numbers toggle                       |
+    | F5        | Compilation                               |
     | F6        | Neotree Toggle                            |
     | F7        | Terminal                                  |
     | F8        | Google Translate                          |
