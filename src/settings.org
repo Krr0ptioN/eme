@@ -1,4 +1,7 @@
-* Function
+* Method
+** Reload config and write the el file
+   #+BEGIN_SRC emacs-lisp
+   #+END_SRC
 ** Fast forward
   #+BEGIN_SRC emacs-lisp
   (defun forward-symbol-shift-aware (arg)
@@ -72,7 +75,7 @@
        (goto-char pt)))
    #+END_SRC 
 
-** file
+** File
    #+BEGIN_SRC emacs-lisp
 (defun add-to-alist (symbol name value)
   "Add new pair to ALIST"
@@ -302,23 +305,25 @@
 	  ;; ;(load-theme 'base16-classic-dark)
 	  ;; ;(load-theme 'base16-black-metal-venom)
 	  ;; )
+
 	  ;; gruber-darker theme
 	  (use-package gruber-darker-theme
 	  :ensure t
 	  :config 
 	  ;	  (load-theme 'gruber-darker))
 	  )
+
 	  ;; badwolf theme
 	  (use-package badwolf-theme
 	  :ensure t
 	  :config
-	  	  (load-theme 'badwolf)
-	  )
+	  (load-theme 'badwolf))
+
 	  ;; distinguished theme
 	  (use-package distinguished-theme
 	  :ensure t
 	  :config
-	  ;(load-theme 'distinguished t)
+	  ;;(load-theme 'distinguished t)
 	  )
 
 	#+END_SRC
