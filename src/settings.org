@@ -367,6 +367,15 @@
   (dashboard-setup-startup-hook))
   #+END_SRC
  
+*** ANSI Colorize issue
+      #+BEGIN_SRC emacs-lisp
+      (use-package ansi-color
+      	:config
+	      (defun my-colorize-compilation-buffer ()
+		      (when (eq major-mode 'compilation-mode)
+			      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+	:hook (compilation-filter . my-colorize-compilation-buffer))
+#+END_SRC
 ** Mode
 *** Org Mode
 **** Keyword used in todo file and org-mode
