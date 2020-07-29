@@ -225,8 +225,7 @@
 	 '(("lambda" . 955) ; λ
           ("->" . 8594)    ; →
           ("=>" . 8658)    ; ⇒
-          ("map" . 8614)    ; ↦ 
-	  ))
+          ("map" . 8614)))    ; ↦ 
 	 #+END_SRC
 
 *** Visual select background color
