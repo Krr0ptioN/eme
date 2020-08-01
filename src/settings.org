@@ -212,7 +212,7 @@
 
 **** Display font
 	#+BEGIN_SRC emacs-lisp
-	(set-default-font "Fira Code-9")
+	(set-default-font "Fira Code-10")
 	;(use-package fira-code-mode
 	;:ensure t 
 	;:config (global-fira-code-mode))
@@ -295,24 +295,36 @@
 	  ;; Org mode 
 	  ;(doom-themes-org-config))
 	  )
+	  ;; base16 theme 
 	  ;; (use-package base16-theme
 	  ;; ;:ensure t
 	  ;; ;:config
 	  ;; ;(load-theme 'base16-classic-dark)
 	  ;; ;(load-theme 'base16-black-metal-venom)
 	  ;; )
+	  ;; gruber-darker theme
 	  (use-package gruber-darker-theme
 	  :ensure t
 	  :config 
 	  ;	  (load-theme 'gruber-darker))
 	  )
+	  ;; badwolf theme
 	  (use-package badwolf-theme
 	  :ensure t
 	  :config
-	  (load-theme 'badwolf))
-
+	  	  (load-theme 'badwolf)
+	  )
+	  ;; distinguished theme
+	  (use-package distinguished-theme
+	  :ensure t
+	  :config
+	  ;(load-theme 'distinguished t)
+	  )
 
 	#+END_SRC
+
+	#+RESULTS:
+
 **** Neotree theme
 	#+BEGIN_SRC emacs-lisp
 	(use-package neotree :ensure t
@@ -401,6 +413,21 @@
     (global-set-key [f8] 'google-translate-smooth-translate))
     #+END_SRC
 
+*** Dump Jump
+  #+BEGIN_SRC emacs-lisp
+    (use-package dumb-jump 
+    :ensure t
+    :bind 
+        (("M-g o" . dumb-jump-go-other-window)
+    	("M-g j" . dumb-jump-go)
+        ("M-g b" . dumb-jump-back)
+        ("M-g i" . dumb-jump-go-prompt)
+        ("M-g x" . dumb-jump-go-prefer-external)
+        ("M-g z" . dumb-jump-go-prefer-external-other-window))
+     :config 
+     (setq dumb-jump-selector 'ivy) ;; (setq dumb-jump-selector 'helm)
+     (add-hook 'xref-backend-function #'dumb-jump-xref-acrivate))
+  #+END_SRC
 *** Assembly mode
     #+BEGIN_SRC emacs-lisp
 
@@ -426,11 +453,11 @@
      #+END_SRC
 
 **** Tab size
- #+BEGIN_SRC emacs-lisp
- (setq-default c-basic-offset 8 c-default-style "linux")
- (setq-default tab-width 8 indent-tabs-mode t)
- ; (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
- #+END_SRC
+     #+BEGIN_SRC emacs-lisp
+     (setq-default c-basic-offset 8 c-default-style "linux")
+     (setq-default tab-width 8 indent-tabs-mode t)
+     ; (define-key c-mode-base-map (kbd "RET") 'newline-and-indent)
+     #+END_SRC
 
 **** Auto complete
    #+BEGIN_SRC emacs-lisp
@@ -451,6 +478,11 @@
    (global-flycheck-mode)
    #+END_SRC
 
+**** Cmake Mode
+     #+BEGIN_SRC emacs-lisp
+     (use-package cmake-mode
+     :ensure t)
+     #+END_SRC
 **** Keybinding
 	   #+BEGIN_SRC emacs-lisp
 	   ;(key-chord-define cc-mode-map ";;"  "\C-e;")
@@ -458,7 +490,11 @@
            #+BEGIN_SRC emacs-lisp
            ;(key-chord-define cc-mode-map "{}"  "{\n\n}\C-p\t")
            #+END_SRC
-      
+*** Documentation Viewer
+    #+BEGIN_SRC emacs-lisp
+    (use-package helm-dash
+    :ensure t)
+    #+END_SRC
 *** Golang mode
 **** Ensure the go specific autocomplete is active in go-mode
       #+BEGIN_SRC emacs-lisp
@@ -556,6 +592,27 @@
     (use-package powershell
     :ensure t)
     #+END_SRC
+*** Rust mode
+    #+BEGIN_SRC emacs-lisp
+    (use-package rust-mode
+    :ensure t)
+    #+END_SRC
+**** Cargo
+     #+BEGIN_SRC emacs-lisp
+     (use-package cargo
+     :ensure t)
+     (add-hook 'rust-mode-hook 'cargo-minor-mode)
+     #+END_SRC
+**** Format
+     #+BEGIN_SRC emacs-lisp
+     (add-hook 'rust-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+     #+END_SRC
+**** flycheck
+     #+BEGIN_SRC emacs-lisp
+     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+     #+END_SRC
 *** Magit
 **** Keybinding
 ***** Open status
@@ -565,6 +622,11 @@
     :config
     (global-set-key (kbd "C-x g") 'magit-status))
     #+END_SRC
+*** Markdown mode
+   #+BEGIN_SRC emacs-lisp
+   (use-package markdown-mode
+   :ensure t)
+   #+END_SRC
 *** Terminal Emulators
     #+BEGIN_SRC emacs-lisp
     (use-package vterm :ensure t)
@@ -580,28 +642,33 @@
 
 ** Keybinding
 
-    | Key       | Description                             |
-    |-----------+-----------------------------------------|
-    | C-S-up    | swap line to up                         |
-    | C-S-down  | swap line to down                       |
-    | C-S-left  | Indent and shift to left                |
-    | C-S-right | Indent and shift to right               |
-    | C-x g     | Magit                                   |
-    | C-c t     | Modeline toggle                         |
-    | C-c r     | Reload config file                      |
-    | C-=       | Expand region                           |
-    | C-x C-m   | Man page                                |
-    | C-S-c     | multiple-cursor/edit-lines              |
-    | C->       | multiple-cursor/mark-next-like-this     |
-    | C-<       | multiple-cursor/mark-previous-like-this |
-    | C-c C-<   | multiple-cursor/editmark-all-like-this  |
-    | M-Return  | Execute command in background           |
-    | C-x n     | Line numbers toggle                     |
-    | F6        | Neotree Toggle                          |
-    | F7        | Terminal                                |
-    | F8        | Google Translate                        |
-    | M-n       | scroll down                             |
-    | M-p       | scroll up                               |
+    | Key       | Description                               |
+    |-----------+-------------------------------------------|
+    | C-S-up    | swap line to up                           |
+    | C-S-down  | swap line to down                         |
+    | C-S-left  | Indent and shift to left                  |
+    | C-S-right | Indent and shift to right                 |
+    | C-x g     | Magit                                     |
+    | C-c t     | Modeline toggle                           |
+    | C-c r     | Reload config file                        |
+    | C-=       | Expand region                             |
+    | C-x C-m   | Man page                                  |
+    | C-S-c     | multiple-cursor/edit-lines                |
+    | C->       | multiple-cursor/mark-next-like-this       |
+    | C-<       | multiple-cursor/mark-previous-like-this   |
+    | C-c C-<   | multiple-cursor/editmark-all-like-this    |
+    | M-Return  | Execute command in background             |
+    | C-x n     | Line numbers toggle                       |
+    | F6        | Neotree Toggle                            |
+    | F7        | Terminal                                  |
+    | F8        | Google Translate                          |
+    | M-n       | scroll down                               |
+    | M-p       | scroll up                                 |
+    | M-g j     | dumb jump go                              |
+    | M-g o     | dumb jump go other window                 |
+    | M-g b     | dumb jump back                            |
+    | M-g x     | dumb jump go prefer external              |
+    | M-g z     | dumb jump go prefer external other window |
 
 
 *** Shift the line to up or down
