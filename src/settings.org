@@ -78,7 +78,7 @@
 ** File
    #+BEGIN_SRC emacs-lisp
 (defun add-to-alist (symbol name value)
-  "Add new pair to ALIST"
+   "Add new pair to ALIST"
   (let* ((list (symbol-value symbol))
          (pair (assoc name list)))
     (if pair
@@ -215,7 +215,7 @@
 
 **** Display font
 	#+BEGIN_SRC emacs-lisp
-	(set-default-font "Fira Code-10")
+	(set-default-font "Fira Code-12")
 	;(use-package fira-code-mode
 	;:ensure t 
 	;:config (global-fira-code-mode))
@@ -305,26 +305,19 @@
 	  ;; ;(load-theme 'base16-classic-dark)
 	  ;; ;(load-theme 'base16-black-metal-venom)
 	  ;; )
-
+	  
 	  ;; gruber-darker theme
 	  (use-package gruber-darker-theme
 	  :ensure t
 	  :config 
-	  ;	  (load-theme 'gruber-darker))
-	  )
-
+	  (load-theme 'gruber-darker))
+	  
 	  ;; badwolf theme
-	  (use-package badwolf-theme
-	  :ensure t
-	  :config
-	  (load-theme 'badwolf))
+	  ;;(use-package badwolf-theme
+	  ;;:ensure t
+	  ;;:config
+	  ;;(load-theme 'badwolf))
 
-	  ;; distinguished theme
-	  (use-package distinguished-theme
-	  :ensure t
-	  :config
-	  ;;(load-theme 'distinguished t)
-	  )
 
 	#+END_SRC
 
@@ -513,83 +506,16 @@
 		;; Non-nil means display source file containing the main routin at startup
 	        Gdb-show-main t)
       #+END_SRC
+*** SLIME
+    #+BEGIN_SRC emacs-lisp
+    (load (expand-file-name "~/.quicklisp/slime-helper.el"))
+    (setq inferior-lisp-program "sbcl")
+    #+END_SRC
 *** Documentation Viewer
     #+BEGIN_SRC emacs-lisp
     (use-package helm-dash
     :ensure t)
     #+END_SRC
-*** Golang mode
-**** Ensure the go specific autocomplete is active in go-mode
-      #+BEGIN_SRC emacs-lisp
-      (use-package go-autocomplete
-      :ensure t)
-      (with-eval-after-load 'go-mode
-      (require 'go-autocomplete))
-      #+END_SRC
-**** PATH
-     #+BEGIN_SRC emacs-lisp
-     (use-package exec-path-from-shell
-     :ensure t)
-     (when (memq window-system '(mac ns x))
-           (exec-path-from-shell-initialize)
-           (exec-path-from-shell-copy-env "GOPATH"))
-     #+END_SRC
-
-**** guru settings
-     #+BEGIN_SRC emacs-lisp
-    (use-package go-guru
-    :ensure t
-    )
-    (go-guru-hl-identifier-mode)
-     #+END_SRC
-
-**** Keybinding
-***** Go to definition
-    #+BEGIN_SRC emacs-lisp
-    (local-set-key (kbd "M-.") 'godef-jump)
-    #+END_SRC
-
-***** Return from whence you came
-    #+BEGIN_SRC emacs-lisp
-    (local-set-key (kbd "M-*") 'pop-tag-mark)
-    #+END_SRC
-
-***** Invoke compiler
-       #+BEGIN_SRC emacs-lisp
-	  (local-set-key (kbd "M-p") 'compile) 
-       #+END_SRC
-
-***** Redo most recent compile cmd
-    #+BEGIN_SRC emacs-lisp
-	(local-set-key (kbd "M-P") 'recompile)
-    #+END_SRC
-
-***** Error
-****** Go to next error (or msg)
-	#+BEGIN_SRC emacs-lisp
-     (local-set-key (kbd "M-]") 'next-error) 
-	#+END_SRC
-
-****** Go to previous error or msg
-	#+BEGIN_SRC emacs-lisp
-	  (local-set-key (kbd "M-[") 'previous-error)
-	#+END_SRC
-
-**** Go documentation
-     #+BEGIN_SRC emacs-lisp
-     (add-hook 'go-mode-hook '(lambda ()
-     (local-set-key (kbd "C-c C-k") 'godoc)))
-     (add-hook 'go-mode-hook 'company-mode)
-     (add-hook 'go-mode-hook (lambda ()
-     (set (make-local-variable 'company-backends) '(company-go))
-     (company-mode)))
-     #+END_SRC 
- 
-**** HOOK
-     #+BEGIN_SRC emacs-lisp
-     (add-hook 'go-mode-hook 'extin-go-mode-hook)
-     #+END_SRC
-
 *** LaTeX mode
 *** Python mode
 **** Elpy
@@ -637,8 +563,6 @@
      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
      #+END_SRC
 *** Magit
-**** Keybinding
-***** Open status
     #+BEGIN_SRC emacs-lisp
     (use-package magit
     :ensure t
@@ -669,6 +593,8 @@
     |-----------+-------------------------------------------|
     | C-S-up    | swap line to up                           |
     | C-S-down  | swap line to down                         |
+    | M-S-p     | swap line to up                           |
+    | M-S-n     | swap line to down                         |
     | C-S-left  | Indent and shift to left                  |
     | C-S-right | Indent and shift to right                 |
     | C-x g     | Magit                                     |
@@ -693,12 +619,16 @@
     | M-g b     | dumb jump back                            |
     | M-g x     | dumb jump go prefer external              |
     | M-g z     | dumb jump go prefer external other window |
+    |-----------+-------------------------------------------|
+
 
 
 *** Shift the line to up or down
    #+BEGIN_SRC emacs-lisp
    (global-set-key [\C-\S-up] 'move-text-up)
    (global-set-key [\C-\S-down] 'move-text-down)
+   (global-set-key (kbd "<M-S-n>") 'move-text-down)
+   (global-set-key (kbd "<M-S-p>") 'move-text-up)
    #+END_SRC 
 
 *** Indent the line to left or right
