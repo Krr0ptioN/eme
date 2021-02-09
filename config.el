@@ -10,7 +10,7 @@
       user-mail-address "mardin-pop@protonmail.com")
 
 (setq doom-font (font-spec :family "JetBrains Mono" :size 12)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 14)
+      doom-big-font (font-spec :family "JetBrains Mono Italic" :size 14)
       doom-variable-pitch-font (font-spec :family "JetBrains Mono" :size 12)
       doom-serif-font (font-spec :family "JetBrains Mono" :weight 'light))
 
@@ -19,7 +19,7 @@
 (setq display-line-numbers-type 'relative)
 (add-to-list 'company-backends #'company-tabnine)
 
-
 (load! "module")
 (load! "org-config")
+;; (load! "packages")
 (load! "map")

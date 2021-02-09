@@ -30,4 +30,3 @@
 (package! company-tabnine)
 (package! multiple-cursors)
 (package! expand-region)
-(package! writeroom)

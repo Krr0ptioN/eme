@@ -18,4 +18,4 @@
       "<f6>" 'neotree-toggle
       "M-C-2" 'centaur-tabs-forward
       "M-C-1" 'centaur-tabs-backward
-      "<f7>" 'vterm/toggle)
+      "<f7>" 'vterm-toggle)
